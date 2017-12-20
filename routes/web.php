@@ -22,9 +22,8 @@ Route::get('admin/login','Admin\AuthController@getLogin');
 Route::post('admin/login','Admin\AuthController@postLogin');
 // Route::get('admin/register','Admin\AuthController@getRegister');
 // Route::post('admin/register','Admin\AuthController@postRegister');
-Route::get('admin/dashboard','AdminController@getIndex');
+Route::get('admin/dashboard','AdminController@index');
 Route::get('admin/logout','AdminController@getLogout');
-
 
 
 

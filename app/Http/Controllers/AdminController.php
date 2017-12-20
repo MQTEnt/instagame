@@ -13,10 +13,10 @@ class AdminController extends Controller
     public function __construct() {
     	$this->middleware('admin',['except' => 'getLogout']);
     }
-    public function getIndex()
+    public function index()
     {
         $admin = Auth::guard('admin')->user();
-    	return $admin;
+        return view('admin.layout.master');
     }
     public function getLogout() {
     	Auth::guard('admin')->logout();
