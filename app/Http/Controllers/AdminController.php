@@ -9,13 +9,11 @@ use Auth;
 
 class AdminController extends Controller
 {
-    
     public function __construct() {
     	$this->middleware('admin',['except' => 'getLogout']);
     }
     public function index()
     {
-        $admin = Auth::guard('admin')->user();
         return view('admin.layout.master');
     }
     public function getLogout() {

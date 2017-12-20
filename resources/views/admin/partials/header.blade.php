@@ -101,7 +101,7 @@
         <li class="dropdown user user-menu">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">
             <img src="/img/user.png" class="user-image" alt="User Image">
-            <span class="hidden-xs">Name</span>
+            <span class="hidden-xs">{{$admin->name}}</span>
           </a>
           <ul class="dropdown-menu">
             <!-- User image -->
@@ -110,7 +110,7 @@
 
               <p>
                 Info...
-                <small>Join date</small>
+                <small>Join date: {{$admin->created_at->format('Y-m-d')}}</small>
               </p>
             </li>
             <!-- Menu Body -->
