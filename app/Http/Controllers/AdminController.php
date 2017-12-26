@@ -14,7 +14,7 @@ class AdminController extends Controller
     }
     public function index()
     {
-        return view('admin.layout.master');
+        return view('admin.dashboard');
     }
     public function getLogout() {
     	Auth::guard('admin')->logout();

@@ -13,17 +13,9 @@
 
   <!-- Main row -->
   <div class="row">
-    <!-- Left col -->
-    <section class="col-lg-7 connectedSortable">
-      <p>Left col</p>
+    <section class="col-lg-12 connectedSortable">
+      @yield('main-content')
     </section>
-    <!-- /.Left col -->
-
-    <!-- Right col (We are only adding the ID to make the widgets sortable)-->
-    <section class="col-lg-5 connectedSortable">
-      <p>Right col</p>
-    </section>
-    <!-- right col -->
   </div>
   <!-- /.row (main row) -->
 </section>

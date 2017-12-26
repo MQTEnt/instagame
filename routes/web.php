@@ -18,12 +18,24 @@ Route::get('/', function () {
 /*
  * Admin
  */
-Route::get('admin/login','Admin\AuthController@getLogin');
-Route::post('admin/login','Admin\AuthController@postLogin');
-// Route::get('admin/register','Admin\AuthController@getRegister');
-// Route::post('admin/register','Admin\AuthController@postRegister');
-Route::get('admin/dashboard','AdminController@index');
-Route::get('admin/logout','AdminController@getLogout');
+Route::group(['prefix' => 'admin'], function () {
+	//Login - Logout
+	Route::get('login','Admin\AuthController@getLogin');
+	Route::post('login','Admin\AuthController@postLogin');
+	Route::get('logout','AdminController@getLogout');
+
+	//Dashboard
+	Route::get('dashboard', ['as' => 'dashboard.index', 'uses' => 'AdminController@index']);
+
+	//Tag
+	Route::get('tag/search', ['as' => 'tag.search', 'uses' => 'Admin\TagController@getSearch']);
+	Route::get('tag', ['as' => 'tag.index', 'uses' => 'Admin\TagController@index']);
+	Route::get('tag/create', ['as' => 'tag.create', 'uses' => 'Admin\TagController@create']);
+	Route::post('tag', ['as' => 'tag.store', 'uses' => 'Admin\TagController@store']);
+	Route::get('tag/{id}', ['as' => 'tag.show', 'uses' => 'Admin\TagController@show']);
+	Route::put('tag/{id}', ['as' => 'tag.update', 'uses' => 'Admin\TagController@update']);
+	Route::delete('tag/{id}', ['as' => 'tag.destroy', 'uses' => 'Admin\TagController@destroy']);
+});
 
 
 
