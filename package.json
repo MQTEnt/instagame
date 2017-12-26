@@ -17,7 +17,7 @@
     "webpack": "^1.13.1"
   },
   "name": "instagame",
-  "description": "Doctor and Nurse Features",
+  "description": "",
   "version": "1.0.0",
   "main": "gulpfile.js",
   "directories": {

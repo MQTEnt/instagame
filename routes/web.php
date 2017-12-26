@@ -36,7 +36,9 @@ Route::group(['prefix' => 'admin'], function () {
 	Route::put('tag/{id}', ['as' => 'tag.update', 'uses' => 'Admin\TagController@update']);
 	Route::delete('tag/{id}', ['as' => 'tag.destroy', 'uses' => 'Admin\TagController@destroy']);
 
+	//Item
 	Route::get('item', ['as' => 'item.index', 'uses' => 'Admin\ItemController@index']);
+	Route::get('item/create', ['as' => 'item.create', 'uses' => 'Admin\ItemController@create']);
 });
 
 

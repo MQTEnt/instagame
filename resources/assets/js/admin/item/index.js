@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Create from './Create';
 ReactDOM.render(
-  <p>Items management</p>,
+  <Create/>,
   document.getElementById('root')
 );
