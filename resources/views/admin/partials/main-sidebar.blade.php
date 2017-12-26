@@ -36,6 +36,11 @@
           <i class="fa fa-tags"></i> <span>Tags management</span>
         </a>
       </li>
+      <li class="{{ Route::is('item.*') ? 'active' : '' }} treeview">
+        <a href="{{ route('item.index')}}">
+          <i class="fa fa-cubes"></i> <span>Items management</span>
+        </a>
+      </li>
     </ul>
   </section>
   <!-- /.sidebar -->
