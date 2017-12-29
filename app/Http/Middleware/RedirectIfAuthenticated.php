@@ -26,7 +26,7 @@ class RedirectIfAuthenticated
             return redirect('/');
         }
 
-        //If admin login successfully
+        //If access to route have to authenticate but authenticate with admin before
         if (Auth::guard('admin')->check()) {
             return redirect('/admin/dashboard');
         }
