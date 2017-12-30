@@ -17,10 +17,10 @@ export default class Create extends React.Component{
 			errorInputDesc: '',
 			errorInputImage: '',
 			errorInputTag: '',
-			rating: 1,
-			isFirstClick: true,
+			rate: 1,
 
-			tags: []
+			tags: [],
+			tagList: []
 		}
 
 		this.clickBtnHandle = this.clickBtnHandle.bind(this);
@@ -31,44 +31,118 @@ export default class Create extends React.Component{
 		this.onClickTagHandle = this.onClickTagHandle.bind(this);
 		this.validateImage = this.validateImage.bind(this);
 	}
+	componentDidMount(){
+		//Get data
+		setTimeout(function(){
+			//Get data
+			fetch('/admin/tag/list', {
+				credentials: 'same-origin'
+			})
+			.then(function(response) {
+				return response.json()
+			}).then(function(obj) {
+				//Data Response
+				// console.log('Data Response: ', obj);
+				this.setState({tagList: obj})
+			}.bind(this))
+			.catch(function(ex) {
+				//Log Error
+				console.log('parsing failed', ex)
+			});
+		}.bind(this), 1500);
+	}
 	clickBtnHandle(){
 		//console.log(this.state);
-		if(this.state.isFirstClick){
-	        /*
-	         * Fields haven't been modified
-	         */
+		let {
+			errorInputName, 
+			errorInputDesc, 
+			errorInputImage, 
+			errorInputTag,
+			name,
+			desc,
+			tags,
+			image,
+			rate
+		} = {...this.state};
+		if(!name||!desc||!image||tags.length===0){
         	this.setState({
-        		errorInputName: (!this.state.name&&!this.state.errorInputName)?'Fill this field':this.state.errorInputName,
-				errorInputDesc: (!this.state.desc&&!this.state.errorInputDesc)?'Fill this field':this.state.errorInputDesc,
-				errorInputImage: (!this.state.image&&!this.state.errorInputImage)?'Choose image file':this.state.errorInputImage,
-				errorInputTag: (this.state.tags.length===0&&!this.state.errorInputTag)?'Choose any tag':this.state.errorInputTag,
-				isFirstClick: false
+        		errorInputName: (!name&&!errorInputName)?'Fill this field':errorInputName,
+				errorInputDesc: (!desc&&!errorInputDesc)?'Fill this field':errorInputDesc,
+				errorInputImage: (!image&&!errorInputImage)?'Choose image file':errorInputImage,
+				errorInputTag: (tags.length===0&&!errorInputTag)?'Choose any tag':errorInputTag
         	});
-	    console.log('first time');
 	    }
 	    else{
-	    	//The next time
-	    	console.log('The next time');
+    		//Submit
+    		let _token = document.getElementsByName("csrf-token")[0].getAttribute("content");
+			let formData = new FormData();
+		    formData.append('name', name);
+		    formData.append('desc', desc);
+		    formData.append('rate', rate);
+		    formData.append('tags', JSON.stringify(tags));
+		    formData.append('image', image);
+
+		    //Token
+    		formData.append('_token', _token);
+
+    		//POST (AJAX)
+		    fetch('/admin/item', {
+		    	method: 'POST',
+		    	credentials: 'same-origin',
+		    	body: formData
+		    })
+		    .then(function(response) {
+		      return response.json()
+		    }).then(function(obj) {
+		    	//console.log(obj)
+		    	if(obj.state === 1){
+		    		alert('Successfully created!')
+		    		window.location = "/admin/item";
+		    	}
+		    	else{
+		    		alert('Error from server!');
+		    	}
+		    }.bind(this))
+		    .catch(function(ex) {
+		      //Log Error
+		      console.log('parsing failed', ex)
+		    });
 	    }
 	}
 	validateName(txt){
 		if(txt.length < 3){
 			this.setState({
-				errorInputName: 'This field must be at least 3 characters long'
+				errorInputName: 'This field must be at least 3 characters long',
+				name: ''
 			});
 			return;
 		}
 		else{
-			this.setState({
-				errorInputName: '',
-				name: txt
+			//Check unique name
+			fetch('/admin/item/checkName/'+txt, {
+				credentials: 'same-origin'
+			})
+			.then(function(response) {
+				return response.json()
+			}).then(function(obj) {
+				//Data Response
+				// console.log('Data Response: ', obj);
+				this.setState({
+					errorInputName: (obj.state === 1)?'':obj.message,
+					name: (obj.state === 1)?txt:''
+				});
+			}.bind(this))
+			.catch(function(ex) {
+				console.log('parsing failed', ex)
 			});
+			return;
 		}
 	}
 	validateDesc(txt){
 		if(txt.length < 5){
 			this.setState({
-				errorInputDesc: 'This field must be at least 5 characters long'
+				errorInputDesc: 'This field must be at least 5 characters long',
+				desc: ''
 			});
 			return;
 		}
@@ -80,7 +154,7 @@ export default class Create extends React.Component{
 		}
 	}
 	onStarClick(nextValue, prevValue, name) {
-        this.setState({rating: nextValue});
+        this.setState({rate: nextValue});
     }
     onSelectTagHandle(value, tag){
     	let tags = this.state.tags;
@@ -132,7 +206,7 @@ export default class Create extends React.Component{
 	    }
     }
 	render(){
-		let rating = this.state.rating;
+		let rate = this.state.rate;
 		return(
 			<div className="box box-primary">
 				<div className="box-body">
@@ -151,12 +225,12 @@ export default class Create extends React.Component{
 						errorText={this.state.errorInputDesc}
 					/>
 					<div className='form-group'>
-		                <label>Rating {rating}</label>
+		                <label>Rating {rate}</label>
 		                <div style={{fontSize: '200%'}}>
 			                <StarRatingComponent 
 			                    name="rate1" 
 			                    starCount={10}
-			                    value={rating}
+			                    value={rate}
 			                    onStarClick={this.onStarClick}
 			                />
 		                </div>
@@ -164,10 +238,11 @@ export default class Create extends React.Component{
 
 				    <SearchBox
 				    	label='Tag'
-				    	selectedTags={this.state.tags}
+				    	selectedItems={this.state.tags}
 				    	onSelectTagHandle={this.onSelectTagHandle}
 				    	onClickTagHandle={this.onClickTagHandle}
 				    	errorText={this.state.errorInputTag}
+				    	list={this.state.tagList}
 				    />
 
 				    <UploadFile

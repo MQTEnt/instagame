@@ -8,12 +8,14 @@ export default class SearchBox extends React.Component{
 
 		this.state = {
 			value: '',
+			list: []
 		}
-		this.displaySelectedTags = this.displaySelectedTags.bind(this);
+		this.displaySelectedItem = this.displaySelectedItem.bind(this);
+		this.onSelectHandle = this.onSelectHandle.bind(this);
 	}
-	displaySelectedTags(){
-    	let tags = this.props.selectedTags;
-    	return (tags.map( (tag) => (
+	displaySelectedItem(){
+    	let selectedItem = this.props.selectedItems;
+    	return (selectedItem.map( (tag) => (
               <span 
 				key={tag.id} 
 				style={{marginRight: '10px', cursor: 'pointer'}} 
@@ -27,19 +29,19 @@ export default class SearchBox extends React.Component{
           )
     	);
     }
+    onSelectHandle(value, item){
+    	this.props.onSelectTagHandle(value, item);
+    	this.setState({value});
+    }
 	render(){
-		let {label, errorText} = {...this.props}
+		let {label, errorText, list} = {...this.props}
 		return(
 			<div className={(!errorText)?'form-group':'form-group has-error'}>
     			<label>{label}</label>
     			<div>
             		<ReactAutocomplete
-				        items={[
-				          { id: '1', name: 'foo' },
-				          { id: '2', name: 'bar' },
-				          { id: '3', name: 'baz' },
-				        ]}
-				        shouldItemRender={(item, value) => item.name.toLowerCase().indexOf(value.toLowerCase()) > -1}
+				        items={list}
+				        shouldItemRender={(item, value) => (value!=='')?item.name.toLowerCase().indexOf(value.toLowerCase()) > -1:''}
 				        getItemValue={item => item.name}
 				        renderItem={(item, highlighted) =>
 				          <div
@@ -51,11 +53,11 @@ export default class SearchBox extends React.Component{
 				        }
 				        value={this.state.value}
 				        onChange={e => this.setState({ value: e.target.value })}
-				        onSelect={this.props.onSelectTagHandle}
+				        onSelect={this.onSelectHandle}
 			      	/>
 		      	</div>
 		      	<div>
-		      		{this.displaySelectedTags()}
+		      		{this.displaySelectedItem()}
 		      	</div>
 		      	{(errorText)?
 					<span className="help-block">

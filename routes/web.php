@@ -28,6 +28,7 @@ Route::group(['prefix' => 'admin'], function () {
 	Route::get('dashboard', ['as' => 'dashboard.index', 'uses' => 'AdminController@index']);
 
 	//Tag
+	Route::get('tag/list', 'Admin\TagController@getList');
 	Route::get('tag/search', ['as' => 'tag.search', 'uses' => 'Admin\TagController@getSearch']);
 	Route::get('tag', ['as' => 'tag.index', 'uses' => 'Admin\TagController@index']);
 	Route::get('tag/create', ['as' => 'tag.create', 'uses' => 'Admin\TagController@create']);
@@ -39,6 +40,8 @@ Route::group(['prefix' => 'admin'], function () {
 	//Item
 	Route::get('item', ['as' => 'item.index', 'uses' => 'Admin\ItemController@index']);
 	Route::get('item/create', ['as' => 'item.create', 'uses' => 'Admin\ItemController@create']);
+	Route::post('item', ['as' => 'item.store', 'uses' => 'Admin\ItemController@store']);
+	Route::get('item/checkName/{name}', 'Admin\ItemController@checkName');
 });
 
 

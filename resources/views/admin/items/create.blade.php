@@ -1,4 +1,8 @@
 @extends('admin.layout.master')
+@section('token')
+	<meta name='csrf-token' content='{{csrf_token()}}'/>
+@stop
+
 @section('title-side', 'Add new item')
 
 @section('big-title', 'Add new item')
@@ -13,6 +17,7 @@
 @stop
 
 @section('main-content')
+
 <!-- table -->
 <div id="root">
 </div>

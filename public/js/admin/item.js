@@ -21759,6 +21759,8 @@
 		value: true
 	});
 
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _react = __webpack_require__(1);
@@ -21805,10 +21807,10 @@
 				errorInputDesc: '',
 				errorInputImage: '',
 				errorInputTag: '',
-				rating: 1,
-				isFirstClick: true,
+				rate: 1,
 
-				tags: []
+				tags: [],
+				tagList: []
 			};
 
 			_this.clickBtnHandle = _this.clickBtnHandle.bind(_this);
@@ -21822,24 +21824,79 @@
 		}
 
 		_createClass(Create, [{
+			key: 'componentDidMount',
+			value: function componentDidMount() {
+				//Get data
+				setTimeout(function () {
+					//Get data
+					fetch('/admin/tag/list', {
+						credentials: 'same-origin'
+					}).then(function (response) {
+						return response.json();
+					}).then(function (obj) {
+						//Data Response
+						// console.log('Data Response: ', obj);
+						this.setState({ tagList: obj });
+					}.bind(this)).catch(function (ex) {
+						//Log Error
+						console.log('parsing failed', ex);
+					});
+				}.bind(this), 1500);
+			}
+		}, {
 			key: 'clickBtnHandle',
 			value: function clickBtnHandle() {
 				//console.log(this.state);
-				if (this.state.isFirstClick) {
-					/*
-	     * Fields haven't been modified
-	     */
+				var _state = _extends({}, this.state),
+				    errorInputName = _state.errorInputName,
+				    errorInputDesc = _state.errorInputDesc,
+				    errorInputImage = _state.errorInputImage,
+				    errorInputTag = _state.errorInputTag,
+				    name = _state.name,
+				    desc = _state.desc,
+				    tags = _state.tags,
+				    image = _state.image,
+				    rate = _state.rate;
+
+				if (!name || !desc || !image || tags.length === 0) {
 					this.setState({
-						errorInputName: !this.state.name && !this.state.errorInputName ? 'Fill this field' : this.state.errorInputName,
-						errorInputDesc: !this.state.desc && !this.state.errorInputDesc ? 'Fill this field' : this.state.errorInputDesc,
-						errorInputImage: !this.state.image && !this.state.errorInputImage ? 'Choose image file' : this.state.errorInputImage,
-						errorInputTag: this.state.tags.length === 0 && !this.state.errorInputTag ? 'Choose any tag' : this.state.errorInputTag,
-						isFirstClick: false
+						errorInputName: !name && !errorInputName ? 'Fill this field' : errorInputName,
+						errorInputDesc: !desc && !errorInputDesc ? 'Fill this field' : errorInputDesc,
+						errorInputImage: !image && !errorInputImage ? 'Choose image file' : errorInputImage,
+						errorInputTag: tags.length === 0 && !errorInputTag ? 'Choose any tag' : errorInputTag
 					});
-					console.log('first time');
 				} else {
-					//The next time
-					console.log('The next time');
+					//Submit
+					var _token = document.getElementsByName("csrf-token")[0].getAttribute("content");
+					var formData = new FormData();
+					formData.append('name', name);
+					formData.append('desc', desc);
+					formData.append('rate', rate);
+					formData.append('tags', JSON.stringify(tags));
+					formData.append('image', image);
+
+					//Token
+					formData.append('_token', _token);
+
+					//POST (AJAX)
+					fetch('/admin/item', {
+						method: 'POST',
+						credentials: 'same-origin',
+						body: formData
+					}).then(function (response) {
+						return response.json();
+					}).then(function (obj) {
+						//console.log(obj)
+						if (obj.state === 1) {
+							alert('Successfully created!');
+							window.location = "/admin/item";
+						} else {
+							alert('Error from server!');
+						}
+					}.bind(this)).catch(function (ex) {
+						//Log Error
+						console.log('parsing failed', ex);
+					});
 				}
 			}
 		}, {
@@ -21847,14 +21904,27 @@
 			value: function validateName(txt) {
 				if (txt.length < 3) {
 					this.setState({
-						errorInputName: 'This field must be at least 3 characters long'
+						errorInputName: 'This field must be at least 3 characters long',
+						name: ''
 					});
 					return;
 				} else {
-					this.setState({
-						errorInputName: '',
-						name: txt
+					//Check unique name
+					fetch('/admin/item/checkName/' + txt, {
+						credentials: 'same-origin'
+					}).then(function (response) {
+						return response.json();
+					}).then(function (obj) {
+						//Data Response
+						// console.log('Data Response: ', obj);
+						this.setState({
+							errorInputName: obj.state === 1 ? '' : obj.message,
+							name: obj.state === 1 ? txt : ''
+						});
+					}.bind(this)).catch(function (ex) {
+						console.log('parsing failed', ex);
 					});
+					return;
 				}
 			}
 		}, {
@@ -21862,7 +21932,8 @@
 			value: function validateDesc(txt) {
 				if (txt.length < 5) {
 					this.setState({
-						errorInputDesc: 'This field must be at least 5 characters long'
+						errorInputDesc: 'This field must be at least 5 characters long',
+						desc: ''
 					});
 					return;
 				} else {
@@ -21875,7 +21946,7 @@
 		}, {
 			key: 'onStarClick',
 			value: function onStarClick(nextValue, prevValue, name) {
-				this.setState({ rating: nextValue });
+				this.setState({ rate: nextValue });
 			}
 		}, {
 			key: 'onSelectTagHandle',
@@ -21937,7 +22008,7 @@
 		}, {
 			key: 'render',
 			value: function render() {
-				var rating = this.state.rating;
+				var rate = this.state.rate;
 				return _react2.default.createElement(
 					'div',
 					{ className: 'box box-primary' },
@@ -21965,7 +22036,7 @@
 								'label',
 								null,
 								'Rating ',
-								rating
+								rate
 							),
 							_react2.default.createElement(
 								'div',
@@ -21973,17 +22044,18 @@
 								_react2.default.createElement(_reactStarRatingComponent2.default, {
 									name: 'rate1',
 									starCount: 10,
-									value: rating,
+									value: rate,
 									onStarClick: this.onStarClick
 								})
 							)
 						),
 						_react2.default.createElement(_SearchBox2.default, {
 							label: 'Tag',
-							selectedTags: this.state.tags,
+							selectedItems: this.state.tags,
 							onSelectTagHandle: this.onSelectTagHandle,
 							onClickTagHandle: this.onClickTagHandle,
-							errorText: this.state.errorInputTag
+							errorText: this.state.errorInputTag,
+							list: this.state.tagList
 						}),
 						_react2.default.createElement(_UploadFile2.default, {
 							label: 'Image file',
@@ -22134,19 +22206,21 @@
 			var _this = _possibleConstructorReturn(this, (SearchBox.__proto__ || Object.getPrototypeOf(SearchBox)).call(this, props));
 
 			_this.state = {
-				value: ''
+				value: '',
+				list: []
 			};
-			_this.displaySelectedTags = _this.displaySelectedTags.bind(_this);
+			_this.displaySelectedItem = _this.displaySelectedItem.bind(_this);
+			_this.onSelectHandle = _this.onSelectHandle.bind(_this);
 			return _this;
 		}
 
 		_createClass(SearchBox, [{
-			key: 'displaySelectedTags',
-			value: function displaySelectedTags() {
+			key: 'displaySelectedItem',
+			value: function displaySelectedItem() {
 				var _this2 = this;
 
-				var tags = this.props.selectedTags;
-				return tags.map(function (tag) {
+				var selectedItem = this.props.selectedItems;
+				return selectedItem.map(function (tag) {
 					return _react2.default.createElement(
 						'span',
 						{
@@ -22163,13 +22237,20 @@
 				});
 			}
 		}, {
+			key: 'onSelectHandle',
+			value: function onSelectHandle(value, item) {
+				this.props.onSelectTagHandle(value, item);
+				this.setState({ value: value });
+			}
+		}, {
 			key: 'render',
 			value: function render() {
 				var _this3 = this;
 
 				var _props = _extends({}, this.props),
 				    label = _props.label,
-				    errorText = _props.errorText;
+				    errorText = _props.errorText,
+				    list = _props.list;
 
 				return _react2.default.createElement(
 					'div',
@@ -22183,9 +22264,9 @@
 						'div',
 						null,
 						_react2.default.createElement(_reactAutocomplete2.default, {
-							items: [{ id: '1', name: 'foo' }, { id: '2', name: 'bar' }, { id: '3', name: 'baz' }],
+							items: list,
 							shouldItemRender: function shouldItemRender(item, value) {
-								return item.name.toLowerCase().indexOf(value.toLowerCase()) > -1;
+								return value !== '' ? item.name.toLowerCase().indexOf(value.toLowerCase()) > -1 : '';
 							},
 							getItemValue: function getItemValue(item) {
 								return item.name;
@@ -22204,13 +22285,13 @@
 							onChange: function onChange(e) {
 								return _this3.setState({ value: e.target.value });
 							},
-							onSelect: this.props.onSelectTagHandle
+							onSelect: this.onSelectHandle
 						})
 					),
 					_react2.default.createElement(
 						'div',
 						null,
-						this.displaySelectedTags()
+						this.displaySelectedItem()
 					),
 					errorText ? _react2.default.createElement(
 						'span',

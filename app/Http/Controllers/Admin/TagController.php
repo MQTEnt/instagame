@@ -49,4 +49,8 @@ class TagController extends Controller
             ['name', 'LIKE', '%'.$query.'%']])->paginate(5);
         return view('admin.tags.index', ['tags' => $tags]);
     }
+    public function getList(){
+        $tags = Tag::select(['id', 'name'])->get();
+        return $tags;
+    }
 }
