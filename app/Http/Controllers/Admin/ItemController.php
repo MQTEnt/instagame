@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Item;
 use App\ItemTag;
 use DB;
+use Illuminate\Support\Facades\Storage;
 
 class ItemController extends Controller
 {
@@ -52,7 +53,7 @@ class ItemController extends Controller
             $item->save();
 
             //Create item - tag...
-            //Add items just 1 query (Update later...)
+            //Add item_tag just 1 query (Update later...)
             foreach ($tags as $value) {
                 ItemTag::create([
                     'item_id' => $item->id,
@@ -77,5 +78,50 @@ class ItemController extends Controller
             ON (tags.id = temp_tbl.tag_id)
         ');
         return $tags;
+    }
+    public function update($id, Request $request){
+        $item = Item::findOrFail($id);
+        //Validate on server (Update later...)
+
+        $tags = json_decode($request->tags, true);
+
+        //Validate if current tags == removed_arr && added_arr == []
+        if($request->hasFile('image')){
+            //New image
+            $fileNameExt = $request->file('image')->getClientOriginalName();
+            $fileName = pathinfo($fileNameExt, PATHINFO_FILENAME);
+            $fileExt = $request->file('image')->getClientOriginalExtension();
+            $fileNameToStore = $fileName.'_'.time().'.'.$fileExt;
+            $pathToStore = $request->file('image')->storeAs('public/images',$fileNameToStore);
+
+            //Delete image
+            unlink(storage_path('app/public/'.$item->image));
+
+            $item->image = 'images/'.$fileNameToStore;
+        }
+
+        //Update item
+        $item->name = $request->name;
+        $item->desc = $request->desc;
+        $item->rate = $request->rate;
+        $item->save();
+
+        //Update item-tag
+        //Update item_tag just 1 query (Update later...)
+        foreach ($tags[0] as $value) {
+            ItemTag::create([
+                'item_id' => $item->id,
+                'tag_id' => $value['id']
+            ]);
+        }
+        foreach ($tags[1] as $value) {
+            $item_tag = ItemTag::where([
+                ['tag_id', '=', $value['id']],
+                ['item_id', '=', $item->id]
+            ]);
+            $item_tag->delete();
+        }
+
+        return ['state' => 1, 'message' => 'Success'];
     }
 }

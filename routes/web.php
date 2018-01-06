@@ -43,6 +43,7 @@ Route::group(['prefix' => 'admin'], function () {
 	Route::post('item', ['as' => 'item.store', 'uses' => 'Admin\ItemController@store']);
 	Route::get('item/detail/{id}', ['as' => 'item.show', 'uses' => 'Admin\ItemController@show']);
 	Route::get('item/{id}', 'Admin\ItemController@getItemById');
+	Route::put('item/{id}', 'Admin\ItemController@update');
 	Route::get('item/checkName/{name}', 'Admin\ItemController@checkName');
 	Route::get('item/getTags/{id}', 'Admin\ItemController@getTagsByItemId');
 

@@ -110,10 +110,6 @@ export default class Edit extends React.Component{
 			console.log('Error');
 		else{
 			console.log('Submit');
-
-			// console.log(oldTags, tags);
-			// return;
-
 			let before = new Set(oldTags);
     		let after = new Set(tags);
 
@@ -125,28 +121,24 @@ export default class Edit extends React.Component{
 
 		    let addedArr = Array.from(added);
     		let removedArr = Array.from(removed);
-
-    		//console.log(oldTags, tags);
-
-		 	console.log(addedArr);
-		 	console.log(removedArr);
-			return;
-
+		 	// console.log(addedArr);
+		 	// console.log(removedArr);
 
 			//Submit
+			let item_id = document.getElementById('root').getAttribute("data-item-id");
     		let _token = document.getElementsByName("csrf-token")[0].getAttribute("content");
 			let formData = new FormData();
 		    formData.append('name', name);
 		    formData.append('desc', desc);
 		    formData.append('rate', rate);
-		    formData.append('tags', JSON.stringify(tags));
+		    formData.append('tags', JSON.stringify([addedArr, removedArr]));
 		    formData.append('image', image);
 
 		    //Token
     		formData.append('_token', _token);
+    		formData.append('_method', 'PUT');
 
-    		//POST (AJAX)
-		    fetch('/admin/item', {
+		    fetch('/admin/item/'+item_id, {
 		    	method: 'POST',
 		    	credentials: 'same-origin',
 		    	body: formData
@@ -156,8 +148,8 @@ export default class Edit extends React.Component{
 		    }).then(function(obj) {
 		    	//console.log(obj)
 		    	if(obj.state === 1){
-		    		alert('Successfully created!')
-		    		window.location = "/admin/item";
+		    		alert('Successfully updated!')
+		    		window.location = "/admin/item/detail/"+item_id;
 		    	}
 		    	else{
 		    		alert('Error from server!');

@@ -24173,10 +24173,6 @@
 				}
 				if (!name || !desc || tags.length === 0 || !image && !currentImage) console.log('Error');else {
 					console.log('Submit');
-
-					// console.log(oldTags, tags);
-					// return;
-
 					var before = new Set(oldTags);
 					var after = new Set(tags);
 
@@ -24188,27 +24184,24 @@
 
 					var addedArr = Array.from(added);
 					var removedArr = Array.from(removed);
-
-					//console.log(oldTags, tags);
-
-					console.log(addedArr);
-					console.log(removedArr);
-					return;
+					// console.log(addedArr);
+					// console.log(removedArr);
 
 					//Submit
+					var item_id = document.getElementById('root').getAttribute("data-item-id");
 					var _token = document.getElementsByName("csrf-token")[0].getAttribute("content");
 					var formData = new FormData();
 					formData.append('name', name);
 					formData.append('desc', desc);
 					formData.append('rate', rate);
-					formData.append('tags', JSON.stringify(tags));
+					formData.append('tags', JSON.stringify([addedArr, removedArr]));
 					formData.append('image', image);
 
 					//Token
 					formData.append('_token', _token);
+					formData.append('_method', 'PUT');
 
-					//POST (AJAX)
-					fetch('/admin/item', {
+					fetch('/admin/item/' + item_id, {
 						method: 'POST',
 						credentials: 'same-origin',
 						body: formData
@@ -24217,8 +24210,8 @@
 					}).then(function (obj) {
 						//console.log(obj)
 						if (obj.state === 1) {
-							alert('Successfully created!');
-							window.location = "/admin/item";
+							alert('Successfully updated!');
+							window.location = "/admin/item/detail/" + item_id;
 						} else {
 							alert('Error from server!');
 						}
