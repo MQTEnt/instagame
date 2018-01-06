@@ -51,7 +51,7 @@
 				<td>{{$item->name}}</td>
 				<td>{{$item->desc}}</td>
 				<td>{{$item->rate}}</td>
-				<td style='text-align: center'><a href="#"><i class="fa fa-chevron-circle-right"></i></a></td>
+				<td style='text-align: center'><a href="{{route('item.show', $item->id)}}"><i class="fa fa-chevron-circle-right"></i></a></td>
 			</tr>
 			@endforeach
 		</table>

@@ -41,7 +41,11 @@ Route::group(['prefix' => 'admin'], function () {
 	Route::get('item', ['as' => 'item.index', 'uses' => 'Admin\ItemController@index']);
 	Route::get('item/create', ['as' => 'item.create', 'uses' => 'Admin\ItemController@create']);
 	Route::post('item', ['as' => 'item.store', 'uses' => 'Admin\ItemController@store']);
+	Route::get('item/detail/{id}', ['as' => 'item.show', 'uses' => 'Admin\ItemController@show']);
+	Route::get('item/{id}', 'Admin\ItemController@getItemById');
 	Route::get('item/checkName/{name}', 'Admin\ItemController@checkName');
+	Route::get('item/getTags/{id}', 'Admin\ItemController@getTagsByItemId');
+
 });
 
 
@@ -49,3 +53,8 @@ Route::group(['prefix' => 'admin'], function () {
 
 Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('model', function(){
+	$item = App\Item::select()->where('id', 8)->with(['tags.tag'])->first();
+	return $item->tags;
+});

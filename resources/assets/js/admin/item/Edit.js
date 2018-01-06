@@ -2,10 +2,11 @@ import React from 'react';
 import TextInput from '../TextInput';
 import SearchBox from '../SearchBox';
 import UploadFile from '../UploadFile';
+import Image from '../Image';
 
 import StarRatingComponent from 'react-star-rating-component';
 
-export default class Create extends React.Component{
+export default class Edit extends React.Component{
 	constructor(props){
 		super(props);
 
@@ -19,8 +20,11 @@ export default class Create extends React.Component{
 			errorInputTag: '',
 			rate: 1,
 
+			oldTags: [],
 			tags: [],
-			tagList: []
+			tagList: [],
+
+			currentImage: ''
 		}
 
 		this.clickBtnHandle = this.clickBtnHandle.bind(this);
@@ -30,29 +34,59 @@ export default class Create extends React.Component{
 		this.onSelectTagHandle = this.onSelectTagHandle.bind(this);
 		this.onClickTagHandle = this.onClickTagHandle.bind(this);
 		this.validateImage = this.validateImage.bind(this);
+		this.onClickDeleteImageHandle = this.onClickDeleteImageHandle.bind(this);
 	}
 	componentDidMount(){
-		//Get data
-		setTimeout(function(){
-			//Get data
-			fetch('/admin/tag/list', {
-				credentials: 'same-origin'
-			})
-			.then(function(response) {
-				return response.json()
-			}).then(function(obj) {
-				//Data Response
-				// console.log('Data Response: ', obj);
-				this.setState({tagList: obj})
-			}.bind(this))
-			.catch(function(ex) {
-				//Log Error
-				console.log('parsing failed', ex)
+		let item_id = document.getElementById('root').getAttribute("data-item-id");
+		//Get item detail
+		fetch('/admin/item/'+item_id, {
+			credentials: 'same-origin'
+		})
+		.then(function(response) {
+			return response.json()
+		}).then(function(obj) {
+			//console.log('Data Response: ', obj);
+			this.setState({
+				'name': obj.name,
+				'desc': obj.desc,
+				'rate': obj.rate,
+				'currentImage': obj.image
 			});
-		}.bind(this), 1500);
+		}.bind(this))
+		.catch(function(ex) {
+			console.log('parsing failed', ex)
+		});
+
+		//Get current tags of item
+		fetch('/admin/item/getTags/'+item_id, {
+			credentials: 'same-origin'
+		})
+		.then(function(response) {
+			return response.json()
+		}).then(function(obj) {
+			this.setState({
+				tags: obj,
+				oldTags: [...obj] //Clone
+			})
+		}.bind(this))
+		.catch(function(ex) {
+			console.log('parsing failed', ex)
+		});
+
+		//Get tag list
+		fetch('/admin/tag/list', {
+			credentials: 'same-origin'
+		})
+		.then(function(response) {
+			return response.json()
+		}).then(function(obj) {
+			this.setState({tagList: obj})
+		}.bind(this))
+		.catch(function(ex) {
+			console.log('parsing failed', ex)
+		});
 	}
 	clickBtnHandle(){
-		//console.log(this.state);
 		let {
 			errorInputName, 
 			errorInputDesc, 
@@ -60,20 +94,46 @@ export default class Create extends React.Component{
 			errorInputTag,
 			name,
 			desc,
+			oldTags,
 			tags,
 			image,
-			rate
+			rate,
+			currentImage
 		} = {...this.state};
-		if(!name||!desc||!image||tags.length===0){
-        	this.setState({
-        		errorInputName: (!name&&!errorInputName)?'Fill this field':errorInputName,
-				errorInputDesc: (!desc&&!errorInputDesc)?'Fill this field':errorInputDesc,
-				errorInputImage: (!image&&!errorInputImage)?'Choose image file':errorInputImage,
-				errorInputTag: (tags.length===0&&!errorInputTag)?'Choose any tag':errorInputTag
-        	});
-	    }
-	    else{
-    		//Submit
+
+		if(!image&&!currentImage&&!errorInputImage){
+			console.log('Error, required image');
+			this.setState({errorInputImage: 'Choose image file'});
+			return;
+		}
+		if(!name||!desc||tags.length===0||(!image&&!currentImage))
+			console.log('Error');
+		else{
+			console.log('Submit');
+
+			// console.log(oldTags, tags);
+			// return;
+
+			let before = new Set(oldTags);
+    		let after = new Set(tags);
+
+    		let added = new Set();
+		    added = this.difference(after, before);
+
+		    let removed = new Set();
+		    removed = this.difference(before, after);
+
+		    let addedArr = Array.from(added);
+    		let removedArr = Array.from(removed);
+
+    		//console.log(oldTags, tags);
+
+		 	console.log(addedArr);
+		 	console.log(removedArr);
+			return;
+
+
+			//Submit
     		let _token = document.getElementsByName("csrf-token")[0].getAttribute("content");
 			let formData = new FormData();
 		    formData.append('name', name);
@@ -107,7 +167,7 @@ export default class Create extends React.Component{
 		      //Log Error
 		      console.log('parsing failed', ex)
 		    });
-	    }
+		}
 	}
 	validateName(txt){
 		if(txt.length < 3){
@@ -158,10 +218,15 @@ export default class Create extends React.Component{
     }
     onSelectTagHandle(value, tag){
     	let tags = this.state.tags;
+    	let oldTags = this.state.oldTags;
     	let tag_index = tags.findIndex(item => item.id === tag.id);
     	if(tag_index === -1){
     		//Add
-    		tags.push(tag);
+    		let old_tag_index = oldTags.findIndex(item => item.id === tag.id);
+    		if(old_tag_index === -1)
+    			tags.push(tag);
+    		else
+    			tags.push(oldTags[old_tag_index]);
     		this.setState({
     			tags: tags,
     			errorInputTag:''
@@ -205,8 +270,22 @@ export default class Create extends React.Component{
 	    	})
 	    }
     }
+    onClickDeleteImageHandle(){
+    	if(confirm('Do you want to delete this image?')){
+			this.setState({currentImage: ''});
+		}
+		return;
+    }
+    difference(setA, setB){
+    	var difference = new Set(setA);
+    	for (var elem of setB) {
+    		difference.delete(elem);
+    	}
+    	return difference;
+    }
 	render(){
 		let rate = this.state.rate;
+		let currentImage = this.state.currentImage;
 		return(
 			<div className="box box-primary">
 				<div className="box-body">
@@ -214,6 +293,7 @@ export default class Create extends React.Component{
 						label='Name' 
 						name='name' 
 						placeholder='Tag name'
+						value={this.state.name}
 						onBlurHandle={this.validateName}
 						errorText={this.state.errorInputName}
 					/>
@@ -221,6 +301,7 @@ export default class Create extends React.Component{
 						label='Description' 
 						name='desc' 
 						placeholder='Tag description'
+						value={this.state.desc}
 						onBlurHandle={this.validateDesc}
 						errorText={this.state.errorInputDesc}
 					/>
@@ -244,21 +325,28 @@ export default class Create extends React.Component{
 				    	errorText={this.state.errorInputTag}
 				    	list={this.state.tagList}
 				    />
-
-				    <UploadFile
-				    	label='Image file' 
-						name='image'
-						errorText={this.state.errorInputImage}	
-				    	onChangeHandle={this.validateImage}
-				    />
-
+				    {
+				    	(currentImage)?
+				    	<Image 
+				    		src={'/storage/'+currentImage}
+				    		handleClick={this.onClickDeleteImageHandle}
+				    	/>
+				    	:
+				    	<UploadFile
+					    	label='Image file' 
+							name='image'
+							errorText={this.state.errorInputImage}	
+					    	onChangeHandle={this.validateImage}
+				    	/>
+				    }
+				   
 				</div>
 				<div className="box-footer">
 					<button 
 						className="btn btn-primary"
 						onClick={this.clickBtnHandle}
 					>
-						<i className="fa fa-share" aria-hidden="true"></i> Create
+						<i className="fa fa-share" aria-hidden="true"></i> Update
 					</button>
 				</div>
 			</div>

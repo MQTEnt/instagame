@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Item;
 use App\ItemTag;
+use DB;
 
 class ItemController extends Controller
 {
@@ -47,10 +48,11 @@ class ItemController extends Controller
             $item->name = $request->name;
             $item->desc = $request->desc;
             $item->rate = $request->rate;
-            $item->image = 'public/images/'.$fileNameToStore;
+            $item->image = 'images/'.$fileNameToStore;
             $item->save();
 
             //Create item - tag...
+            //Add items just 1 query (Update later...)
             foreach ($tags as $value) {
                 ItemTag::create([
                     'item_id' => $item->id,
@@ -60,5 +62,20 @@ class ItemController extends Controller
             
             return ['state' => 1, 'message' => 'Success'];
         }
+    }
+    public function show($id){
+        return view('admin.items.show', ['item_id' => $id]);
+    }
+    public function getItemById($id){
+        $item = Item::findOrFail($id);
+        return $item;
+    }
+    public function getTagsByItemId($id){
+        $tags = DB::select('
+            SELECT temp_tbl.tag_id AS id, tags.name AS name FROM tags
+            JOIN (SELECT * FROM item_tag WHERE item_tag.item_id = '.$id.') AS temp_tbl 
+            ON (tags.id = temp_tbl.tag_id)
+        ');
+        return $tags;
     }
 }

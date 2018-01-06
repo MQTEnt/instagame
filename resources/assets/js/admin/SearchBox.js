@@ -30,7 +30,7 @@ export default class SearchBox extends React.Component{
     	);
     }
     onSelectHandle(value, item){
-    	this.props.onSelectTagHandle(value, item);
+    	this.props.onSelectTagHandle(value, {id: item.id, name: item.name});
     	this.setState({value});
     }
 	render(){

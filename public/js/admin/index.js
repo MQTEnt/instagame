@@ -22122,10 +22122,30 @@
 		function TextInput(props) {
 			_classCallCheck(this, TextInput);
 
-			return _possibleConstructorReturn(this, (TextInput.__proto__ || Object.getPrototypeOf(TextInput)).call(this, props));
+			var _this = _possibleConstructorReturn(this, (TextInput.__proto__ || Object.getPrototypeOf(TextInput)).call(this, props));
+
+			_this.onChangeHandle = _this.onChangeHandle.bind(_this);
+			_this.state = {
+				value: ''
+			};
+			return _this;
 		}
 
 		_createClass(TextInput, [{
+			key: 'onChangeHandle',
+			value: function onChangeHandle(value) {
+				this.setState({
+					value: value
+				});
+			}
+		}, {
+			key: 'componentDidUpdate',
+			value: function componentDidUpdate(prevProps, prevState) {
+				if (prevProps.value !== this.props.value) {
+					this.setState({ value: this.props.value });
+				}
+			}
+		}, {
 			key: 'render',
 			value: function render() {
 				var _this2 = this;
@@ -22134,7 +22154,8 @@
 				    name = _props.name,
 				    label = _props.label,
 				    placeholder = _props.placeholder,
-				    errorText = _props.errorText;
+				    errorText = _props.errorText,
+				    value = _props.value;
 
 				return _react2.default.createElement(
 					'div',
@@ -22151,6 +22172,10 @@
 						placeholder: placeholder,
 						onBlur: function onBlur(e) {
 							return _this2.props.onBlurHandle(e.target.value);
+						},
+						value: this.state.value,
+						onChange: function onChange(e) {
+							return _this2.onChangeHandle(e.target.value);
 						}
 					}),
 					errorText ? _react2.default.createElement(
@@ -24283,6 +24308,7 @@
 							label: 'Name',
 							name: 'name',
 							placeholder: 'Tag name',
+							value: this.state.name,
 							onBlurHandle: this.validateName,
 							errorText: this.state.errorInputName
 						}),
@@ -24290,6 +24316,7 @@
 							label: 'Description',
 							name: 'desc',
 							placeholder: 'Tag description',
+							value: this.state.desc,
 							onBlurHandle: this.validateDesc,
 							errorText: this.state.errorInputDesc
 						}),

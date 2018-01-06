@@ -4,7 +4,7 @@ module.exports = {
   entry: './resources/assets/js/admin/item/index.js',
 
   output: {
-    filename: 'item.js',
+    filename: 'edit.js',
     path: path.join('public/js/admin')
   },
 

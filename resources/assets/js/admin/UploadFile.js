@@ -29,7 +29,7 @@ export default class UploadFile extends React.Component{
 		let srcFile = this.state.srcFile;
 		let style = {
 			image: {
-				width: '200px',
+				width: '250px',
 				height: 'auto'
 			},
 			div: {
