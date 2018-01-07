@@ -44,6 +44,7 @@ Route::group(['prefix' => 'admin'], function () {
 	Route::get('item/detail/{id}', ['as' => 'item.show', 'uses' => 'Admin\ItemController@show']);
 	Route::get('item/{id}', 'Admin\ItemController@getItemById');
 	Route::put('item/{id}', 'Admin\ItemController@update');
+	Route::delete('item/{id}', 'Admin\ItemController@destroy');
 	Route::get('item/checkName/{name}', 'Admin\ItemController@checkName');
 	Route::get('item/getTags/{id}', 'Admin\ItemController@getTagsByItemId');
 

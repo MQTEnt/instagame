@@ -35,6 +35,7 @@ export default class Edit extends React.Component{
 		this.onClickTagHandle = this.onClickTagHandle.bind(this);
 		this.validateImage = this.validateImage.bind(this);
 		this.onClickDeleteImageHandle = this.onClickDeleteImageHandle.bind(this);
+		this.onClickDeleteHandle = this.onClickDeleteHandle.bind(this);
 	}
 	componentDidMount(){
 		let item_id = document.getElementById('root').getAttribute("data-item-id");
@@ -275,6 +276,31 @@ export default class Edit extends React.Component{
     	}
     	return difference;
     }
+    onClickDeleteHandle(){
+    	if(confirm('Do you want to delete this item?'))
+		{
+			let item_id = document.getElementById('root').getAttribute("data-item-id");
+	    	let _token = document.getElementsByName("csrf-token")[0].getAttribute("content");
+			let formData = new FormData();
+	    	formData.append('_token', _token);
+	    	formData.append('_method', 'DELETE');
+
+			fetch('/admin/item/'+item_id, {
+				method: 'POST',
+			    credentials: 'same-origin',
+			    body: formData
+			})
+			.then(function(response) {
+				return response.json()
+			}).then(function(obj) {
+				alert('Successfully deleted!')
+		    	window.location = "/admin/item";
+			}.bind(this))
+			.catch(function(ex) {
+				console.log('parsing failed', ex)
+			});
+		}
+    }
 	render(){
 		let rate = this.state.rate;
 		let currentImage = this.state.currentImage;
@@ -334,12 +360,22 @@ export default class Edit extends React.Component{
 				   
 				</div>
 				<div className="box-footer">
-					<button 
-						className="btn btn-primary"
-						onClick={this.clickBtnHandle}
-					>
-						<i className="fa fa-share" aria-hidden="true"></i> Update
-					</button>
+					<div className="col-md-2 col-md-offset-4">
+						<button 
+							className="btn btn-primary btn-block"
+							onClick={this.clickBtnHandle}
+						>
+							<i className="fa fa-share" aria-hidden="true"></i> Update
+						</button>
+					</div>
+					<div className="col-md-2">
+						<button 
+							className="btn btn-danger btn-block"
+							onClick={()=>this.onClickDeleteHandle()}
+						>
+							<i className="fa fa-trash" aria-hidden="true"></i> Delete
+						</button>
+					</div>
 				</div>
 			</div>
 		);

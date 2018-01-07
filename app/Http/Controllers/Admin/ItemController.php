@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Item;
 use App\ItemTag;
 use DB;
-use Illuminate\Support\Facades\Storage;
 
 class ItemController extends Controller
 {
@@ -123,5 +122,13 @@ class ItemController extends Controller
         }
 
         return ['state' => 1, 'message' => 'Success'];
+    }
+    public function destroy($id){
+        $item = Item::findOrFail($id);
+        //Delete image
+        unlink(storage_path('app/public/'.$item->image));
+        
+        $item->delete();
+        return ['state' => 1, 'message' => 'Delete'];
     }
 }
