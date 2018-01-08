@@ -41,6 +41,11 @@
           <i class="fa fa-cubes"></i> <span>Items management</span>
         </a>
       </li>
+      <li class="{{ Route::is('game.*') ? 'active' : '' }} treeview">
+        <a href="{{ route('game.index')}}">
+          <i class="fa fa-gamepad"></i> <span>Games management</span>
+        </a>
+      </li>
     </ul>
   </section>
   <!-- /.sidebar -->

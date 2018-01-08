@@ -48,6 +48,16 @@ Route::group(['prefix' => 'admin'], function () {
 	Route::get('item/checkName/{name}', 'Admin\ItemController@checkName');
 	Route::get('item/getTags/{id}', 'Admin\ItemController@getTagsByItemId');
 
+	//Game
+	Route::get('game', ['as' => 'game.index', 'uses' => 'Admin\GameController@index']);
+	Route::get('game/create', ['as' => 'game.create', 'uses' => 'Admin\GameController@create']);
+	Route::post('game', ['as' => 'game.store', 'uses' => 'Admin\GameController@store']);
+	Route::get('game/detail/{id}', ['as' => 'game.show', 'uses' => 'Admin\GameController@show']);
+	Route::get('game/{id}', 'Admin\GameController@getGameById');
+	Route::put('game/{id}', 'Admin\GameController@update');
+	Route::delete('game/{id}', 'Admin\GameController@destroy');
+	Route::get('game/checkName/{name}', 'Admin\GameController@checkName');
+	Route::get('game/getTags/{id}', 'Admin\GameController@getTagsByGameId');
 });
 
 

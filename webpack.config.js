@@ -1,11 +1,11 @@
 var path = require('path');
 // var webpack = require('webpack');
 module.exports = {
-  entry: './resources/assets/js/admin/item/index.js',
+  entry: './resources/assets/js/admin/game/index.js',
 
   output: {
     filename: 'edit.js',
-    path: path.join('public/js/admin')
+    path: path.join('public/js/admin/game')
   },
 
   module: {
