@@ -310,7 +310,7 @@ export default class Edit extends React.Component{
 					<TextInput 
 						label='Name' 
 						name='name' 
-						placeholder='Tag name'
+						placeholder='Item name'
 						value={this.state.name}
 						onBlurHandle={this.validateName}
 						errorText={this.state.errorInputName}
@@ -318,7 +318,7 @@ export default class Edit extends React.Component{
 					<TextInput 
 						label='Description' 
 						name='desc' 
-						placeholder='Tag description'
+						placeholder='Item description'
 						value={this.state.desc}
 						onBlurHandle={this.validateDesc}
 						errorText={this.state.errorInputDesc}

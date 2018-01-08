@@ -25,5 +25,5 @@
 @stop
 
 @section('js')
-<script src="/js/admin/edit.js"></script>
+<script src="/js/admin/item/edit.js"></script>
 @stop

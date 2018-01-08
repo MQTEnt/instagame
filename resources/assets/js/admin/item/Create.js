@@ -213,14 +213,14 @@ export default class Create extends React.Component{
 					<TextInput 
 						label='Name' 
 						name='name' 
-						placeholder='Tag name'
+						placeholder='Item name'
 						onBlurHandle={this.validateName}
 						errorText={this.state.errorInputName}
 					/>
 					<TextInput 
 						label='Description' 
 						name='desc' 
-						placeholder='Tag description'
+						placeholder='Item description'
 						onBlurHandle={this.validateDesc}
 						errorText={this.state.errorInputDesc}
 					/>

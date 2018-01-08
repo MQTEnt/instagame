@@ -58,12 +58,9 @@
 
 	var _Create2 = _interopRequireDefault(_Create);
 
-	var _Edit = __webpack_require__(197);
-
-	var _Edit2 = _interopRequireDefault(_Edit);
-
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	//import Edit from './Edit';
 	_reactDom2.default.render(_react2.default.createElement(_Create2.default, null), document.getElementById('root'));
 
 /***/ }),
@@ -22022,14 +22019,14 @@
 						_react2.default.createElement(_TextInput2.default, {
 							label: 'Name',
 							name: 'name',
-							placeholder: 'Tag name',
+							placeholder: 'Item name',
 							onBlurHandle: this.validateName,
 							errorText: this.state.errorInputName
 						}),
 						_react2.default.createElement(_TextInput2.default, {
 							label: 'Description',
 							name: 'desc',
-							placeholder: 'Tag description',
+							placeholder: 'Item description',
 							onBlurHandle: this.validateDesc,
 							errorText: this.state.errorInputDesc
 						}),
@@ -22122,10 +22119,30 @@
 		function TextInput(props) {
 			_classCallCheck(this, TextInput);
 
-			return _possibleConstructorReturn(this, (TextInput.__proto__ || Object.getPrototypeOf(TextInput)).call(this, props));
+			var _this = _possibleConstructorReturn(this, (TextInput.__proto__ || Object.getPrototypeOf(TextInput)).call(this, props));
+
+			_this.onChangeHandle = _this.onChangeHandle.bind(_this);
+			_this.state = {
+				value: ''
+			};
+			return _this;
 		}
 
 		_createClass(TextInput, [{
+			key: 'onChangeHandle',
+			value: function onChangeHandle(value) {
+				this.setState({
+					value: value
+				});
+			}
+		}, {
+			key: 'componentDidUpdate',
+			value: function componentDidUpdate(prevProps, prevState) {
+				if (prevProps.value !== this.props.value) {
+					this.setState({ value: this.props.value });
+				}
+			}
+		}, {
 			key: 'render',
 			value: function render() {
 				var _this2 = this;
@@ -22134,7 +22151,8 @@
 				    name = _props.name,
 				    label = _props.label,
 				    placeholder = _props.placeholder,
-				    errorText = _props.errorText;
+				    errorText = _props.errorText,
+				    value = _props.value;
 
 				return _react2.default.createElement(
 					'div',
@@ -22151,6 +22169,10 @@
 						placeholder: placeholder,
 						onBlur: function onBlur(e) {
 							return _this2.props.onBlurHandle(e.target.value);
+						},
+						value: this.state.value,
+						onChange: function onChange(e) {
+							return _this2.onChangeHandle(e.target.value);
 						}
 					}),
 					errorText ? _react2.default.createElement(
@@ -22243,7 +22265,7 @@
 		}, {
 			key: 'onSelectHandle',
 			value: function onSelectHandle(value, item) {
-				this.props.onSelectTagHandle(value, item);
+				this.props.onSelectTagHandle(value, { id: item.id, name: item.name });
 				this.setState({ value: value });
 			}
 		}, {
@@ -23679,7 +23701,7 @@
 				var srcFile = this.state.srcFile;
 				var style = {
 					image: {
-						width: '200px',
+						width: '250px',
 						height: 'auto'
 					},
 					div: {
@@ -23994,361 +24016,6 @@
 	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
 
 	/* WEBPACK VAR INJECTION */}.call(exports, {}))
-
-/***/ }),
-/* 197 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _TextInput = __webpack_require__(185);
-
-	var _TextInput2 = _interopRequireDefault(_TextInput);
-
-	var _SearchBox = __webpack_require__(186);
-
-	var _SearchBox2 = _interopRequireDefault(_SearchBox);
-
-	var _UploadFile = __webpack_require__(193);
-
-	var _UploadFile2 = _interopRequireDefault(_UploadFile);
-
-	var _reactStarRatingComponent = __webpack_require__(194);
-
-	var _reactStarRatingComponent2 = _interopRequireDefault(_reactStarRatingComponent);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var Edit = function (_React$Component) {
-		_inherits(Edit, _React$Component);
-
-		function Edit(props) {
-			_classCallCheck(this, Edit);
-
-			var _this = _possibleConstructorReturn(this, (Edit.__proto__ || Object.getPrototypeOf(Edit)).call(this, props));
-
-			_this.state = {
-				name: '',
-				desc: '',
-				image: null,
-				errorInputName: '',
-				errorInputDesc: '',
-				errorInputImage: '',
-				errorInputTag: '',
-				rate: 1,
-
-				tags: [],
-				tagList: [],
-
-				currentImage: ''
-			};
-
-			_this.clickBtnHandle = _this.clickBtnHandle.bind(_this);
-			_this.validateName = _this.validateName.bind(_this);
-			_this.validateDesc = _this.validateDesc.bind(_this);
-			_this.onStarClick = _this.onStarClick.bind(_this);
-			_this.onSelectTagHandle = _this.onSelectTagHandle.bind(_this);
-			_this.onClickTagHandle = _this.onClickTagHandle.bind(_this);
-			_this.validateImage = _this.validateImage.bind(_this);
-			return _this;
-		}
-
-		_createClass(Edit, [{
-			key: 'componentDidMount',
-			value: function componentDidMount() {
-				var item_id = document.getElementById('root').getAttribute("data-item-id");
-				//Get item detail
-				fetch('/admin/item/' + item_id, {
-					credentials: 'same-origin'
-				}).then(function (response) {
-					return response.json();
-				}).then(function (obj) {
-					//Data Response
-					console.log('Data Response: ', obj);
-					this.setState({
-						'name': obj.name,
-						'desc': obj.desc,
-						'rate': obj.rate
-					});
-				}.bind(this)).catch(function (ex) {
-					//Log Error
-					console.log('parsing failed', ex);
-				});
-
-				//Get tag list
-				fetch('/admin/tag/list', {
-					credentials: 'same-origin'
-				}).then(function (response) {
-					return response.json();
-				}).then(function (obj) {
-					//Data Response
-					// console.log('Data Response: ', obj);
-					this.setState({ tagList: obj });
-				}.bind(this)).catch(function (ex) {
-					//Log Error
-					console.log('parsing failed', ex);
-				});
-			}
-		}, {
-			key: 'clickBtnHandle',
-			value: function clickBtnHandle() {
-				//console.log(this.state);
-				var _state = _extends({}, this.state),
-				    errorInputName = _state.errorInputName,
-				    errorInputDesc = _state.errorInputDesc,
-				    errorInputImage = _state.errorInputImage,
-				    errorInputTag = _state.errorInputTag,
-				    name = _state.name,
-				    desc = _state.desc,
-				    tags = _state.tags,
-				    image = _state.image,
-				    rate = _state.rate;
-
-				if (!name || !desc || !image || tags.length === 0) {
-					this.setState({
-						errorInputName: !name && !errorInputName ? 'Fill this field' : errorInputName,
-						errorInputDesc: !desc && !errorInputDesc ? 'Fill this field' : errorInputDesc,
-						errorInputImage: !image && !errorInputImage ? 'Choose image file' : errorInputImage,
-						errorInputTag: tags.length === 0 && !errorInputTag ? 'Choose any tag' : errorInputTag
-					});
-				} else {
-					//Submit
-					var _token = document.getElementsByName("csrf-token")[0].getAttribute("content");
-					var formData = new FormData();
-					formData.append('name', name);
-					formData.append('desc', desc);
-					formData.append('rate', rate);
-					formData.append('tags', JSON.stringify(tags));
-					formData.append('image', image);
-
-					//Token
-					formData.append('_token', _token);
-
-					//POST (AJAX)
-					fetch('/admin/item', {
-						method: 'POST',
-						credentials: 'same-origin',
-						body: formData
-					}).then(function (response) {
-						return response.json();
-					}).then(function (obj) {
-						//console.log(obj)
-						if (obj.state === 1) {
-							alert('Successfully created!');
-							window.location = "/admin/item";
-						} else {
-							alert('Error from server!');
-						}
-					}.bind(this)).catch(function (ex) {
-						//Log Error
-						console.log('parsing failed', ex);
-					});
-				}
-			}
-		}, {
-			key: 'validateName',
-			value: function validateName(txt) {
-				if (txt.length < 3) {
-					this.setState({
-						errorInputName: 'This field must be at least 3 characters long',
-						name: ''
-					});
-					return;
-				} else {
-					//Check unique name
-					fetch('/admin/item/checkName/' + txt, {
-						credentials: 'same-origin'
-					}).then(function (response) {
-						return response.json();
-					}).then(function (obj) {
-						//Data Response
-						// console.log('Data Response: ', obj);
-						this.setState({
-							errorInputName: obj.state === 1 ? '' : obj.message,
-							name: obj.state === 1 ? txt : ''
-						});
-					}.bind(this)).catch(function (ex) {
-						console.log('parsing failed', ex);
-					});
-					return;
-				}
-			}
-		}, {
-			key: 'validateDesc',
-			value: function validateDesc(txt) {
-				if (txt.length < 5) {
-					this.setState({
-						errorInputDesc: 'This field must be at least 5 characters long',
-						desc: ''
-					});
-					return;
-				} else {
-					this.setState({
-						errorInputDesc: '',
-						desc: txt
-					});
-				}
-			}
-		}, {
-			key: 'onStarClick',
-			value: function onStarClick(nextValue, prevValue, name) {
-				this.setState({ rate: nextValue });
-			}
-		}, {
-			key: 'onSelectTagHandle',
-			value: function onSelectTagHandle(value, tag) {
-				var tags = this.state.tags;
-				var tag_index = tags.findIndex(function (item) {
-					return item.id === tag.id;
-				});
-				if (tag_index === -1) {
-					//Add
-					tags.push(tag);
-					this.setState({
-						tags: tags,
-						errorInputTag: ''
-					});
-				}
-			}
-		}, {
-			key: 'onClickTagHandle',
-			value: function onClickTagHandle(tag_id) {
-				var tags = this.state.tags;
-				var tag_index = tags.findIndex(function (item) {
-					return item.id === tag_id;
-				});
-				if (tag_index !== -1) {
-					//Delete
-					tags.splice(tag_index, 1);
-					this.setState({
-						tags: tags,
-						errorInputTag: tags.length === 0 ? 'Choose any tag' : ''
-					});
-				}
-			}
-		}, {
-			key: 'validateImage',
-			value: function validateImage(e) {
-				//console.log(e.target.files[0]) //File will be uploaded
-
-				var fileName = e.target.value;
-				var lastIndex = fileName.lastIndexOf("\\");
-				if (lastIndex >= 0) {
-					fileName = fileName.substring(lastIndex + 1);
-				}
-				//console.log(fileName);
-				var reg = /(.*?)\.(jpg|jpeg|png)$/;
-				if (!fileName.match(reg)) {
-					this.setState({
-						errorInputImage: 'Invalid file (recommnend .jpg, .jpeg, .png extension)',
-						image: null
-					});
-					return;
-				} else {
-					this.setState({
-						errorInputImage: '',
-						image: e.target.files[0]
-					});
-				}
-			}
-		}, {
-			key: 'render',
-			value: function render() {
-				var rate = this.state.rate;
-				return _react2.default.createElement(
-					'div',
-					{ className: 'box box-primary' },
-					_react2.default.createElement(
-						'div',
-						{ className: 'box-body' },
-						_react2.default.createElement(_TextInput2.default, {
-							label: 'Name',
-							name: 'name',
-							placeholder: 'Tag name',
-							onBlurHandle: this.validateName,
-							errorText: this.state.errorInputName
-						}),
-						_react2.default.createElement(_TextInput2.default, {
-							label: 'Description',
-							name: 'desc',
-							placeholder: 'Tag description',
-							onBlurHandle: this.validateDesc,
-							errorText: this.state.errorInputDesc
-						}),
-						_react2.default.createElement(
-							'div',
-							{ className: 'form-group' },
-							_react2.default.createElement(
-								'label',
-								null,
-								'Rating ',
-								rate
-							),
-							_react2.default.createElement(
-								'div',
-								{ style: { fontSize: '200%' } },
-								_react2.default.createElement(_reactStarRatingComponent2.default, {
-									name: 'rate1',
-									starCount: 10,
-									value: rate,
-									onStarClick: this.onStarClick
-								})
-							)
-						),
-						_react2.default.createElement(_SearchBox2.default, {
-							label: 'Tag',
-							selectedItems: this.state.tags,
-							onSelectTagHandle: this.onSelectTagHandle,
-							onClickTagHandle: this.onClickTagHandle,
-							errorText: this.state.errorInputTag,
-							list: this.state.tagList
-						}),
-						_react2.default.createElement(_UploadFile2.default, {
-							label: 'Image file',
-							name: 'image',
-							errorText: this.state.errorInputImage,
-							onChangeHandle: this.validateImage
-						})
-					),
-					_react2.default.createElement(
-						'div',
-						{ className: 'box-footer' },
-						_react2.default.createElement(
-							'button',
-							{
-								className: 'btn btn-primary',
-								onClick: this.clickBtnHandle
-							},
-							_react2.default.createElement('i', { className: 'fa fa-share', 'aria-hidden': 'true' }),
-							' Create'
-						)
-					)
-				);
-			}
-		}]);
-
-		return Edit;
-	}(_react2.default.Component);
-
-	exports.default = Edit;
 
 /***/ })
 /******/ ]);

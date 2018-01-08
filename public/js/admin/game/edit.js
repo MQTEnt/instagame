@@ -54,17 +54,14 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _Create = __webpack_require__(184);
-
-	var _Create2 = _interopRequireDefault(_Create);
-
-	var _Edit = __webpack_require__(197);
+	var _Edit = __webpack_require__(184);
 
 	var _Edit2 = _interopRequireDefault(_Edit);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	_reactDom2.default.render(_react2.default.createElement(_Edit2.default, null), document.getElementById('root'));
+	//import Create from './Create';
 
 /***/ }),
 /* 1 */
@@ -21783,11 +21780,17 @@
 
 	var _UploadFile2 = _interopRequireDefault(_UploadFile);
 
-	var _reactStarRatingComponent = __webpack_require__(194);
+	var _Image = __webpack_require__(194);
+
+	var _Image2 = _interopRequireDefault(_Image);
+
+	var _reactStarRatingComponent = __webpack_require__(195);
 
 	var _reactStarRatingComponent2 = _interopRequireDefault(_reactStarRatingComponent);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -21795,13 +21798,13 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Create = function (_React$Component) {
-		_inherits(Create, _React$Component);
+	var Edit = function (_React$Component) {
+		_inherits(Edit, _React$Component);
 
-		function Create(props) {
-			_classCallCheck(this, Create);
+		function Edit(props) {
+			_classCallCheck(this, Edit);
 
-			var _this = _possibleConstructorReturn(this, (Create.__proto__ || Object.getPrototypeOf(Create)).call(this, props));
+			var _this = _possibleConstructorReturn(this, (Edit.__proto__ || Object.getPrototypeOf(Edit)).call(this, props));
 
 			_this.state = {
 				name: '',
@@ -21813,8 +21816,11 @@
 				errorInputTag: '',
 				rate: 1,
 
+				oldTags: [],
 				tags: [],
-				tagList: []
+				tagList: [],
+
+				currentImage: ''
 			};
 
 			_this.clickBtnHandle = _this.clickBtnHandle.bind(_this);
@@ -21824,33 +21830,60 @@
 			_this.onSelectTagHandle = _this.onSelectTagHandle.bind(_this);
 			_this.onClickTagHandle = _this.onClickTagHandle.bind(_this);
 			_this.validateImage = _this.validateImage.bind(_this);
+			_this.onClickDeleteImageHandle = _this.onClickDeleteImageHandle.bind(_this);
+			_this.onClickDeleteHandle = _this.onClickDeleteHandle.bind(_this);
 			return _this;
 		}
 
-		_createClass(Create, [{
+		_createClass(Edit, [{
 			key: 'componentDidMount',
 			value: function componentDidMount() {
-				//Get data
-				setTimeout(function () {
-					//Get data
-					fetch('/admin/tag/list', {
-						credentials: 'same-origin'
-					}).then(function (response) {
-						return response.json();
-					}).then(function (obj) {
-						//Data Response
-						// console.log('Data Response: ', obj);
-						this.setState({ tagList: obj });
-					}.bind(this)).catch(function (ex) {
-						//Log Error
-						console.log('parsing failed', ex);
+				var game_id = document.getElementById('root').getAttribute("data-game-id");
+				//Get game detail
+				fetch('/admin/game/' + game_id, {
+					credentials: 'same-origin'
+				}).then(function (response) {
+					return response.json();
+				}).then(function (obj) {
+					//console.log('Data Response: ', obj);
+					this.setState({
+						'name': obj.name,
+						'desc': obj.desc,
+						'rate': obj.rate,
+						'currentImage': obj.image
 					});
-				}.bind(this), 1500);
+				}.bind(this)).catch(function (ex) {
+					console.log('parsing failed', ex);
+				});
+
+				//Get current tags of game
+				fetch('/admin/game/getTags/' + game_id, {
+					credentials: 'same-origin'
+				}).then(function (response) {
+					return response.json();
+				}).then(function (obj) {
+					this.setState({
+						tags: obj,
+						oldTags: [].concat(_toConsumableArray(obj)) //Clone
+					});
+				}.bind(this)).catch(function (ex) {
+					console.log('parsing failed', ex);
+				});
+
+				//Get tag list
+				fetch('/admin/tag/list', {
+					credentials: 'same-origin'
+				}).then(function (response) {
+					return response.json();
+				}).then(function (obj) {
+					this.setState({ tagList: obj });
+				}.bind(this)).catch(function (ex) {
+					console.log('parsing failed', ex);
+				});
 			}
 		}, {
 			key: 'clickBtnHandle',
 			value: function clickBtnHandle() {
-				//console.log(this.state);
 				var _state = _extends({}, this.state),
 				    errorInputName = _state.errorInputName,
 				    errorInputDesc = _state.errorInputDesc,
@@ -21858,32 +21891,48 @@
 				    errorInputTag = _state.errorInputTag,
 				    name = _state.name,
 				    desc = _state.desc,
+				    oldTags = _state.oldTags,
 				    tags = _state.tags,
 				    image = _state.image,
-				    rate = _state.rate;
+				    rate = _state.rate,
+				    currentImage = _state.currentImage;
 
-				if (!name || !desc || !image || tags.length === 0) {
-					this.setState({
-						errorInputName: !name && !errorInputName ? 'Fill this field' : errorInputName,
-						errorInputDesc: !desc && !errorInputDesc ? 'Fill this field' : errorInputDesc,
-						errorInputImage: !image && !errorInputImage ? 'Choose image file' : errorInputImage,
-						errorInputTag: tags.length === 0 && !errorInputTag ? 'Choose any tag' : errorInputTag
-					});
-				} else {
+				if (!image && !currentImage && !errorInputImage) {
+					console.log('Error, required image');
+					this.setState({ errorInputImage: 'Choose image file' });
+					return;
+				}
+				if (!name || !desc || tags.length === 0 || !image && !currentImage) console.log('Error');else {
+					console.log('Submit');
+					var before = new Set(oldTags);
+					var after = new Set(tags);
+
+					var added = new Set();
+					added = this.difference(after, before);
+
+					var removed = new Set();
+					removed = this.difference(before, after);
+
+					var addedArr = Array.from(added);
+					var removedArr = Array.from(removed);
+					// console.log(addedArr);
+					// console.log(removedArr);
+
 					//Submit
+					var game_id = document.getElementById('root').getAttribute("data-game-id");
 					var _token = document.getElementsByName("csrf-token")[0].getAttribute("content");
 					var formData = new FormData();
 					formData.append('name', name);
 					formData.append('desc', desc);
 					formData.append('rate', rate);
-					formData.append('tags', JSON.stringify(tags));
+					formData.append('tags', JSON.stringify([addedArr, removedArr]));
 					formData.append('image', image);
 
 					//Token
 					formData.append('_token', _token);
+					formData.append('_method', 'PUT');
 
-					//POST (AJAX)
-					fetch('/admin/game', {
+					fetch('/admin/game/' + game_id, {
 						method: 'POST',
 						credentials: 'same-origin',
 						body: formData
@@ -21892,8 +21941,8 @@
 					}).then(function (obj) {
 						//console.log(obj)
 						if (obj.state === 1) {
-							alert('Successfully created!');
-							window.location = "/admin/game";
+							alert('Successfully updated!');
+							window.location = "/admin/game/detail/" + game_id;
 						} else {
 							alert('Error from server!');
 						}
@@ -21956,12 +22005,16 @@
 			key: 'onSelectTagHandle',
 			value: function onSelectTagHandle(value, tag) {
 				var tags = this.state.tags;
+				var oldTags = this.state.oldTags;
 				var tag_index = tags.findIndex(function (item) {
 					return item.id === tag.id;
 				});
 				if (tag_index === -1) {
 					//Add
-					tags.push(tag);
+					var old_tag_index = oldTags.findIndex(function (item) {
+						return item.id === tag.id;
+					});
+					if (old_tag_index === -1) tags.push(tag);else tags.push(oldTags[old_tag_index]);
 					this.setState({
 						tags: tags,
 						errorInputTag: ''
@@ -22010,9 +22063,75 @@
 				}
 			}
 		}, {
+			key: 'onClickDeleteImageHandle',
+			value: function onClickDeleteImageHandle() {
+				if (confirm('Do you want to delete this image?')) {
+					this.setState({ currentImage: '' });
+				}
+				return;
+			}
+		}, {
+			key: 'difference',
+			value: function difference(setA, setB) {
+				var difference = new Set(setA);
+				var _iteratorNormalCompletion = true;
+				var _didIteratorError = false;
+				var _iteratorError = undefined;
+
+				try {
+					for (var _iterator = setB[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+						var elem = _step.value;
+
+						difference.delete(elem);
+					}
+				} catch (err) {
+					_didIteratorError = true;
+					_iteratorError = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion && _iterator.return) {
+							_iterator.return();
+						}
+					} finally {
+						if (_didIteratorError) {
+							throw _iteratorError;
+						}
+					}
+				}
+
+				return difference;
+			}
+		}, {
+			key: 'onClickDeleteHandle',
+			value: function onClickDeleteHandle() {
+				if (confirm('Do you want to delete this game?')) {
+					var game_id = document.getElementById('root').getAttribute("data-game-id");
+					var _token = document.getElementsByName("csrf-token")[0].getAttribute("content");
+					var formData = new FormData();
+					formData.append('_token', _token);
+					formData.append('_method', 'DELETE');
+
+					fetch('/admin/game/' + game_id, {
+						method: 'POST',
+						credentials: 'same-origin',
+						body: formData
+					}).then(function (response) {
+						return response.json();
+					}).then(function (obj) {
+						alert('Successfully deleted!');
+						window.location = "/admin/game";
+					}.bind(this)).catch(function (ex) {
+						console.log('parsing failed', ex);
+					});
+				}
+			}
+		}, {
 			key: 'render',
 			value: function render() {
+				var _this2 = this;
+
 				var rate = this.state.rate;
+				var currentImage = this.state.currentImage;
 				return _react2.default.createElement(
 					'div',
 					{ className: 'box box-primary' },
@@ -22023,6 +22142,7 @@
 							label: 'Name',
 							name: 'name',
 							placeholder: 'Game name',
+							value: this.state.name,
 							onBlurHandle: this.validateName,
 							errorText: this.state.errorInputName
 						}),
@@ -22030,6 +22150,7 @@
 							label: 'Description',
 							name: 'desc',
 							placeholder: 'Game description',
+							value: this.state.desc,
 							onBlurHandle: this.validateDesc,
 							errorText: this.state.errorInputDesc
 						}),
@@ -22061,7 +22182,10 @@
 							errorText: this.state.errorInputTag,
 							list: this.state.tagList
 						}),
-						_react2.default.createElement(_UploadFile2.default, {
+						currentImage ? _react2.default.createElement(_Image2.default, {
+							src: '/storage/' + currentImage,
+							handleClick: this.onClickDeleteImageHandle
+						}) : _react2.default.createElement(_UploadFile2.default, {
 							label: 'Image file',
 							name: 'image',
 							errorText: this.state.errorInputImage,
@@ -22072,23 +22196,42 @@
 						'div',
 						{ className: 'box-footer' },
 						_react2.default.createElement(
-							'button',
-							{
-								className: 'btn btn-primary',
-								onClick: this.clickBtnHandle
-							},
-							_react2.default.createElement('i', { className: 'fa fa-share', 'aria-hidden': 'true' }),
-							' Create'
+							'div',
+							{ className: 'col-md-2 col-md-offset-4' },
+							_react2.default.createElement(
+								'button',
+								{
+									className: 'btn btn-primary btn-block',
+									onClick: this.clickBtnHandle
+								},
+								_react2.default.createElement('i', { className: 'fa fa-share', 'aria-hidden': 'true' }),
+								' Update'
+							)
+						),
+						_react2.default.createElement(
+							'div',
+							{ className: 'col-md-2' },
+							_react2.default.createElement(
+								'button',
+								{
+									className: 'btn btn-danger btn-block',
+									onClick: function onClick() {
+										return _this2.onClickDeleteHandle();
+									}
+								},
+								_react2.default.createElement('i', { className: 'fa fa-trash', 'aria-hidden': 'true' }),
+								' Delete'
+							)
 						)
 					)
 				);
 			}
 		}]);
 
-		return Create;
+		return Edit;
 	}(_react2.default.Component);
 
-	exports.default = Create;
+	exports.default = Edit;
 
 /***/ }),
 /* 185 */
@@ -23749,6 +23892,75 @@
 
 	'use strict';
 
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var style = {
+		icon: {
+			fontSize: '130%',
+			color: '#b91b1b',
+			padding: '0px 10px',
+			cursor: 'pointer'
+		}
+	};
+
+	var Image = function (_React$Component) {
+		_inherits(Image, _React$Component);
+
+		function Image(props) {
+			_classCallCheck(this, Image);
+
+			return _possibleConstructorReturn(this, (Image.__proto__ || Object.getPrototypeOf(Image)).call(this, props));
+		}
+
+		_createClass(Image, [{
+			key: 'render',
+			value: function render() {
+				var src = this.props.src;
+				return _react2.default.createElement(
+					'div',
+					{ className: 'form-group' },
+					_react2.default.createElement(
+						'label',
+						null,
+						'Image'
+					),
+					_react2.default.createElement('i', { className: 'fa fa-trash', style: style.icon, onClick: this.props.handleClick }),
+					_react2.default.createElement(
+						'div',
+						null,
+						_react2.default.createElement('img', { src: src, style: { width: '250px', height: 'auto' } })
+					)
+				);
+			}
+		}]);
+
+		return Image;
+	}(_react2.default.Component);
+
+	exports.default = Image;
+
+/***/ }),
+/* 195 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 	Object.defineProperty(exports, "__esModule", {
@@ -23773,7 +23985,7 @@
 
 	var _propTypes2 = _interopRequireDefault(_propTypes);
 
-	var _classnames = __webpack_require__(195);
+	var _classnames = __webpack_require__(196);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -23956,7 +24168,7 @@
 	module.exports = exports['default'];
 
 /***/ }),
-/* 195 */
+/* 196 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -24002,7 +24214,7 @@
 
 		if (typeof module !== 'undefined' && module.exports) {
 			module.exports = classNames;
-		} else if ("function" === 'function' && _typeof(__webpack_require__(196)) === 'object' && __webpack_require__(196)) {
+		} else if ("function" === 'function' && _typeof(__webpack_require__(197)) === 'object' && __webpack_require__(197)) {
 			// register as 'classnames', consistent with npm package name
 			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
 				return classNames;
@@ -24013,564 +24225,12 @@
 	})();
 
 /***/ }),
-/* 196 */
+/* 197 */
 /***/ (function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
 
 	/* WEBPACK VAR INJECTION */}.call(exports, {}))
-
-/***/ }),
-/* 197 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _TextInput = __webpack_require__(185);
-
-	var _TextInput2 = _interopRequireDefault(_TextInput);
-
-	var _SearchBox = __webpack_require__(186);
-
-	var _SearchBox2 = _interopRequireDefault(_SearchBox);
-
-	var _UploadFile = __webpack_require__(193);
-
-	var _UploadFile2 = _interopRequireDefault(_UploadFile);
-
-	var _Image = __webpack_require__(198);
-
-	var _Image2 = _interopRequireDefault(_Image);
-
-	var _reactStarRatingComponent = __webpack_require__(194);
-
-	var _reactStarRatingComponent2 = _interopRequireDefault(_reactStarRatingComponent);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var Edit = function (_React$Component) {
-		_inherits(Edit, _React$Component);
-
-		function Edit(props) {
-			_classCallCheck(this, Edit);
-
-			var _this = _possibleConstructorReturn(this, (Edit.__proto__ || Object.getPrototypeOf(Edit)).call(this, props));
-
-			_this.state = {
-				name: '',
-				desc: '',
-				image: null,
-				errorInputName: '',
-				errorInputDesc: '',
-				errorInputImage: '',
-				errorInputTag: '',
-				rate: 1,
-
-				oldTags: [],
-				tags: [],
-				tagList: [],
-
-				currentImage: ''
-			};
-
-			_this.clickBtnHandle = _this.clickBtnHandle.bind(_this);
-			_this.validateName = _this.validateName.bind(_this);
-			_this.validateDesc = _this.validateDesc.bind(_this);
-			_this.onStarClick = _this.onStarClick.bind(_this);
-			_this.onSelectTagHandle = _this.onSelectTagHandle.bind(_this);
-			_this.onClickTagHandle = _this.onClickTagHandle.bind(_this);
-			_this.validateImage = _this.validateImage.bind(_this);
-			_this.onClickDeleteImageHandle = _this.onClickDeleteImageHandle.bind(_this);
-			_this.onClickDeleteHandle = _this.onClickDeleteHandle.bind(_this);
-			return _this;
-		}
-
-		_createClass(Edit, [{
-			key: 'componentDidMount',
-			value: function componentDidMount() {
-				var game_id = document.getElementById('root').getAttribute("data-game-id");
-				//Get game detail
-				fetch('/admin/game/' + game_id, {
-					credentials: 'same-origin'
-				}).then(function (response) {
-					return response.json();
-				}).then(function (obj) {
-					//console.log('Data Response: ', obj);
-					this.setState({
-						'name': obj.name,
-						'desc': obj.desc,
-						'rate': obj.rate,
-						'currentImage': obj.image
-					});
-				}.bind(this)).catch(function (ex) {
-					console.log('parsing failed', ex);
-				});
-
-				//Get current tags of game
-				fetch('/admin/game/getTags/' + game_id, {
-					credentials: 'same-origin'
-				}).then(function (response) {
-					return response.json();
-				}).then(function (obj) {
-					this.setState({
-						tags: obj,
-						oldTags: [].concat(_toConsumableArray(obj)) //Clone
-					});
-				}.bind(this)).catch(function (ex) {
-					console.log('parsing failed', ex);
-				});
-
-				//Get tag list
-				fetch('/admin/tag/list', {
-					credentials: 'same-origin'
-				}).then(function (response) {
-					return response.json();
-				}).then(function (obj) {
-					this.setState({ tagList: obj });
-				}.bind(this)).catch(function (ex) {
-					console.log('parsing failed', ex);
-				});
-			}
-		}, {
-			key: 'clickBtnHandle',
-			value: function clickBtnHandle() {
-				var _state = _extends({}, this.state),
-				    errorInputName = _state.errorInputName,
-				    errorInputDesc = _state.errorInputDesc,
-				    errorInputImage = _state.errorInputImage,
-				    errorInputTag = _state.errorInputTag,
-				    name = _state.name,
-				    desc = _state.desc,
-				    oldTags = _state.oldTags,
-				    tags = _state.tags,
-				    image = _state.image,
-				    rate = _state.rate,
-				    currentImage = _state.currentImage;
-
-				if (!image && !currentImage && !errorInputImage) {
-					console.log('Error, required image');
-					this.setState({ errorInputImage: 'Choose image file' });
-					return;
-				}
-				if (!name || !desc || tags.length === 0 || !image && !currentImage) console.log('Error');else {
-					console.log('Submit');
-					var before = new Set(oldTags);
-					var after = new Set(tags);
-
-					var added = new Set();
-					added = this.difference(after, before);
-
-					var removed = new Set();
-					removed = this.difference(before, after);
-
-					var addedArr = Array.from(added);
-					var removedArr = Array.from(removed);
-					// console.log(addedArr);
-					// console.log(removedArr);
-
-					//Submit
-					var game_id = document.getElementById('root').getAttribute("data-game-id");
-					var _token = document.getElementsByName("csrf-token")[0].getAttribute("content");
-					var formData = new FormData();
-					formData.append('name', name);
-					formData.append('desc', desc);
-					formData.append('rate', rate);
-					formData.append('tags', JSON.stringify([addedArr, removedArr]));
-					formData.append('image', image);
-
-					//Token
-					formData.append('_token', _token);
-					formData.append('_method', 'PUT');
-
-					fetch('/admin/game/' + game_id, {
-						method: 'POST',
-						credentials: 'same-origin',
-						body: formData
-					}).then(function (response) {
-						return response.json();
-					}).then(function (obj) {
-						//console.log(obj)
-						if (obj.state === 1) {
-							alert('Successfully updated!');
-							window.location = "/admin/game/detail/" + game_id;
-						} else {
-							alert('Error from server!');
-						}
-					}.bind(this)).catch(function (ex) {
-						//Log Error
-						console.log('parsing failed', ex);
-					});
-				}
-			}
-		}, {
-			key: 'validateName',
-			value: function validateName(txt) {
-				if (txt.length < 3) {
-					this.setState({
-						errorInputName: 'This field must be at least 3 characters long',
-						name: ''
-					});
-					return;
-				} else {
-					//Check unique name
-					fetch('/admin/game/checkName/' + txt, {
-						credentials: 'same-origin'
-					}).then(function (response) {
-						return response.json();
-					}).then(function (obj) {
-						//Data Response
-						// console.log('Data Response: ', obj);
-						this.setState({
-							errorInputName: obj.state === 1 ? '' : obj.message,
-							name: obj.state === 1 ? txt : ''
-						});
-					}.bind(this)).catch(function (ex) {
-						console.log('parsing failed', ex);
-					});
-					return;
-				}
-			}
-		}, {
-			key: 'validateDesc',
-			value: function validateDesc(txt) {
-				if (txt.length < 5) {
-					this.setState({
-						errorInputDesc: 'This field must be at least 5 characters long',
-						desc: ''
-					});
-					return;
-				} else {
-					this.setState({
-						errorInputDesc: '',
-						desc: txt
-					});
-				}
-			}
-		}, {
-			key: 'onStarClick',
-			value: function onStarClick(nextValue, prevValue, name) {
-				this.setState({ rate: nextValue });
-			}
-		}, {
-			key: 'onSelectTagHandle',
-			value: function onSelectTagHandle(value, tag) {
-				var tags = this.state.tags;
-				var oldTags = this.state.oldTags;
-				var tag_index = tags.findIndex(function (item) {
-					return item.id === tag.id;
-				});
-				if (tag_index === -1) {
-					//Add
-					var old_tag_index = oldTags.findIndex(function (item) {
-						return item.id === tag.id;
-					});
-					if (old_tag_index === -1) tags.push(tag);else tags.push(oldTags[old_tag_index]);
-					this.setState({
-						tags: tags,
-						errorInputTag: ''
-					});
-				}
-			}
-		}, {
-			key: 'onClickTagHandle',
-			value: function onClickTagHandle(tag_id) {
-				var tags = this.state.tags;
-				var tag_index = tags.findIndex(function (item) {
-					return item.id === tag_id;
-				});
-				if (tag_index !== -1) {
-					//Delete
-					tags.splice(tag_index, 1);
-					this.setState({
-						tags: tags,
-						errorInputTag: tags.length === 0 ? 'Choose any tag' : ''
-					});
-				}
-			}
-		}, {
-			key: 'validateImage',
-			value: function validateImage(e) {
-				//console.log(e.target.files[0]) //File will be uploaded
-
-				var fileName = e.target.value;
-				var lastIndex = fileName.lastIndexOf("\\");
-				if (lastIndex >= 0) {
-					fileName = fileName.substring(lastIndex + 1);
-				}
-				//console.log(fileName);
-				var reg = /(.*?)\.(jpg|jpeg|png)$/;
-				if (!fileName.match(reg)) {
-					this.setState({
-						errorInputImage: 'Invalid file (recommnend .jpg, .jpeg, .png extension)',
-						image: null
-					});
-					return;
-				} else {
-					this.setState({
-						errorInputImage: '',
-						image: e.target.files[0]
-					});
-				}
-			}
-		}, {
-			key: 'onClickDeleteImageHandle',
-			value: function onClickDeleteImageHandle() {
-				if (confirm('Do you want to delete this image?')) {
-					this.setState({ currentImage: '' });
-				}
-				return;
-			}
-		}, {
-			key: 'difference',
-			value: function difference(setA, setB) {
-				var difference = new Set(setA);
-				var _iteratorNormalCompletion = true;
-				var _didIteratorError = false;
-				var _iteratorError = undefined;
-
-				try {
-					for (var _iterator = setB[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-						var elem = _step.value;
-
-						difference.delete(elem);
-					}
-				} catch (err) {
-					_didIteratorError = true;
-					_iteratorError = err;
-				} finally {
-					try {
-						if (!_iteratorNormalCompletion && _iterator.return) {
-							_iterator.return();
-						}
-					} finally {
-						if (_didIteratorError) {
-							throw _iteratorError;
-						}
-					}
-				}
-
-				return difference;
-			}
-		}, {
-			key: 'onClickDeleteHandle',
-			value: function onClickDeleteHandle() {
-				if (confirm('Do you want to delete this game?')) {
-					var game_id = document.getElementById('root').getAttribute("data-game-id");
-					var _token = document.getElementsByName("csrf-token")[0].getAttribute("content");
-					var formData = new FormData();
-					formData.append('_token', _token);
-					formData.append('_method', 'DELETE');
-
-					fetch('/admin/game/' + game_id, {
-						method: 'POST',
-						credentials: 'same-origin',
-						body: formData
-					}).then(function (response) {
-						return response.json();
-					}).then(function (obj) {
-						alert('Successfully deleted!');
-						window.location = "/admin/game";
-					}.bind(this)).catch(function (ex) {
-						console.log('parsing failed', ex);
-					});
-				}
-			}
-		}, {
-			key: 'render',
-			value: function render() {
-				var _this2 = this;
-
-				var rate = this.state.rate;
-				var currentImage = this.state.currentImage;
-				return _react2.default.createElement(
-					'div',
-					{ className: 'box box-primary' },
-					_react2.default.createElement(
-						'div',
-						{ className: 'box-body' },
-						_react2.default.createElement(_TextInput2.default, {
-							label: 'Name',
-							name: 'name',
-							placeholder: 'Game name',
-							value: this.state.name,
-							onBlurHandle: this.validateName,
-							errorText: this.state.errorInputName
-						}),
-						_react2.default.createElement(_TextInput2.default, {
-							label: 'Description',
-							name: 'desc',
-							placeholder: 'Game description',
-							value: this.state.desc,
-							onBlurHandle: this.validateDesc,
-							errorText: this.state.errorInputDesc
-						}),
-						_react2.default.createElement(
-							'div',
-							{ className: 'form-group' },
-							_react2.default.createElement(
-								'label',
-								null,
-								'Rating ',
-								rate
-							),
-							_react2.default.createElement(
-								'div',
-								{ style: { fontSize: '200%' } },
-								_react2.default.createElement(_reactStarRatingComponent2.default, {
-									name: 'rate1',
-									starCount: 10,
-									value: rate,
-									onStarClick: this.onStarClick
-								})
-							)
-						),
-						_react2.default.createElement(_SearchBox2.default, {
-							label: 'Tag',
-							selectedItems: this.state.tags,
-							onSelectTagHandle: this.onSelectTagHandle,
-							onClickTagHandle: this.onClickTagHandle,
-							errorText: this.state.errorInputTag,
-							list: this.state.tagList
-						}),
-						currentImage ? _react2.default.createElement(_Image2.default, {
-							src: '/storage/' + currentImage,
-							handleClick: this.onClickDeleteImageHandle
-						}) : _react2.default.createElement(_UploadFile2.default, {
-							label: 'Image file',
-							name: 'image',
-							errorText: this.state.errorInputImage,
-							onChangeHandle: this.validateImage
-						})
-					),
-					_react2.default.createElement(
-						'div',
-						{ className: 'box-footer' },
-						_react2.default.createElement(
-							'div',
-							{ className: 'col-md-2 col-md-offset-4' },
-							_react2.default.createElement(
-								'button',
-								{
-									className: 'btn btn-primary btn-block',
-									onClick: this.clickBtnHandle
-								},
-								_react2.default.createElement('i', { className: 'fa fa-share', 'aria-hidden': 'true' }),
-								' Update'
-							)
-						),
-						_react2.default.createElement(
-							'div',
-							{ className: 'col-md-2' },
-							_react2.default.createElement(
-								'button',
-								{
-									className: 'btn btn-danger btn-block',
-									onClick: function onClick() {
-										return _this2.onClickDeleteHandle();
-									}
-								},
-								_react2.default.createElement('i', { className: 'fa fa-trash', 'aria-hidden': 'true' }),
-								' Delete'
-							)
-						)
-					)
-				);
-			}
-		}]);
-
-		return Edit;
-	}(_react2.default.Component);
-
-	exports.default = Edit;
-
-/***/ }),
-/* 198 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var style = {
-		icon: {
-			fontSize: '130%',
-			color: '#b91b1b',
-			padding: '0px 10px',
-			cursor: 'pointer'
-		}
-	};
-
-	var Image = function (_React$Component) {
-		_inherits(Image, _React$Component);
-
-		function Image(props) {
-			_classCallCheck(this, Image);
-
-			return _possibleConstructorReturn(this, (Image.__proto__ || Object.getPrototypeOf(Image)).call(this, props));
-		}
-
-		_createClass(Image, [{
-			key: 'render',
-			value: function render() {
-				var src = this.props.src;
-				return _react2.default.createElement(
-					'div',
-					{ className: 'form-group' },
-					_react2.default.createElement(
-						'label',
-						null,
-						'Image'
-					),
-					_react2.default.createElement('i', { className: 'fa fa-trash', style: style.icon, onClick: this.props.handleClick }),
-					_react2.default.createElement(
-						'div',
-						null,
-						_react2.default.createElement('img', { src: src, style: { width: '250px', height: 'auto' } })
-					)
-				);
-			}
-		}]);
-
-		return Image;
-	}(_react2.default.Component);
-
-	exports.default = Image;
 
 /***/ })
 /******/ ]);
