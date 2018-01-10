@@ -8,10 +8,12 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>Instagame</title>
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
 </head>
 <body>
     <div id="app">
@@ -28,8 +30,9 @@
                     </button>
 
                     <!-- Branding Image -->
+                    <i class="fa fa-gamepad" aria-hidden="true"></i>
                     <a class="navbar-brand" href="{{ url('/') }}">
-                        {{ config('app.name', 'Laravel') }}
+                        Instagame
                     </a>
                 </div>
 

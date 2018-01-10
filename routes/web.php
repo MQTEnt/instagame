@@ -60,11 +60,12 @@ Route::group(['prefix' => 'admin'], function () {
 	Route::get('game/getTags/{id}', 'Admin\GameController@getTagsByGameId');
 });
 
-
-
-
-Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/login', function(){
+	return view('auth.login');
+});
+Route::get('/facebook', 'UserLoginController@redirectToProvider')->name('facebook.login');
+Route::get('/facebook/calback', 'UserLoginController@handleProviderCallback');
 
 Route::get('model', function(){
 	$item = App\Item::select()->where('id', 8)->with(['tags.tag'])->first();
