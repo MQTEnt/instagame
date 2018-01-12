@@ -61,13 +61,23 @@ Route::group(['prefix' => 'admin'], function () {
 });
 
 Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/login', function(){
-	return view('auth.login');
-});
+
+//Login
+Route::get('/login', 'UserLoginController@login');
+Route::get('/logout', 'UserLoginController@logout');
+
+//Login Facebook
 Route::get('/facebook', 'UserLoginController@redirectToProvider')->name('facebook.login');
 Route::get('/facebook/calback', 'UserLoginController@handleProviderCallback');
 
+
+
+//Example
 Route::get('model', function(){
 	$item = App\Item::select()->where('id', 8)->with(['tags.tag'])->first();
 	return $item->tags;
 });
+Route::get('page-a', function(){
+	return view('page-a');
+});
+
