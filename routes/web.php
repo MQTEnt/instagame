@@ -73,10 +73,6 @@ Route::get('/facebook/calback', 'UserLoginController@handleProviderCallback');
 
 
 //Example
-Route::get('model', function(){
-	$item = App\Item::select()->where('id', 8)->with(['tags.tag'])->first();
-	return $item->tags;
-});
 Route::get('page-a', function(){
 	return view('page-a');
 });

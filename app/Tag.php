@@ -9,4 +9,8 @@ class Tag extends Model
     protected $fillable = [
         'name', 'desc'
     ];
+    public function item_tag()
+    {
+        return $this->hasMany('App\ItemTag');
+    }
 }

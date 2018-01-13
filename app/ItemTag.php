@@ -15,6 +15,10 @@ class ItemTag extends Model
     {
         return $this->belongsTo('App\Tag');
     }
+    public function item()
+    {
+        return $this->belongsTo('App\Item');
+    }
     public function getTagNameAttribute()
 	{
 		return $this->tag()->first()->name;

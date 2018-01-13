@@ -10,4 +10,8 @@ class GameTag extends Model
 	protected $fillable = [
 		'game_id', 'tag_id'
 	];
+	public function tag()
+    {
+        return $this->belongsTo('App\Tag');
+    }
 }
