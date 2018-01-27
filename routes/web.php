@@ -73,8 +73,8 @@ Route::get('/facebook/calback', 'UserLoginController@handleProviderCallback');
 
 
 //Example
-Route::get('page-a', function(){
-	return view('page-a');
+Route::get('index', function(){
+	return view('index.home');
 });
 Route::get('play/{id}', function($game_id){
 	$game = App\Game::find($game_id);

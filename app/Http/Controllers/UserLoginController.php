@@ -23,6 +23,7 @@ class UserLoginController extends Controller
         if(!is_null(Session::get('user-token'))){
             $token = Session::get('user-token')[0];
             Session::forget('user-token');
+            //What if token expired? (Fix...)
             JWTAuth::invalidate($token);
             return redirect()->route('home');
         }
